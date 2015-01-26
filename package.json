@@ -1,0 +1,11 @@
+{
+	"name": "procedural_globe",
+	"description": "Procedurally generated worlds.",
+	"copyright": "Copyright © 2015, Anders Andersson",
+	"authors": ["Anders Andersson"],
+	"dependencies": {
+		"derelict-gl3" : "~master",
+		"gl3n" : "~master"
+	},
+	"libs": ["GLU", "allegro", "allegro_primitives", "allegro_image", "allegro_font", "allegro_ttf", "allegro_color"]
+}
