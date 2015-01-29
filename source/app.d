@@ -73,13 +73,14 @@ public:
 		
 		globe = new Globe;
 		globe.Init(1);
-		auto model = globe.Generate_detailed_location(vec3(1, 0, 0), 1, 5);
+		auto model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 6);
+		model.Show_normals = false;
 		modelnode = new Modelnode;
 		modelnode.Set_model(model);
 		
 		
 		transformnode.Attach_node(modelnode);
-		lightnode.Attach_node(quad);
+		//lightnode.Attach_node(quad);
 		lightnode.Attach_node(transformnode);
 		camera.Attach_node(lightnode);
 		root.Attach_node(camera);

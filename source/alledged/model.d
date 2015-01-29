@@ -6,6 +6,14 @@ import gl3n.linalg;
 
 class Model {
 public:
+	bool Show_normals() const @property {
+		return show_normals;
+	}
+
+    void Show_normals(bool sn) @property {
+		show_normals = sn;
+	}
+    
 	void Set_model_data(vec3[] c, int[] f) {
 		normals.length = c.length;
 		uv_coords.length = c.length;
@@ -21,7 +29,7 @@ public:
 		for (int i = 0; i < faces.length; i += 3) {
 			vec3 in1 = coords[faces[i+1]] - coords[faces[i]];
 			vec3 in2 = coords[faces[i+2]] - coords[faces[i]];
-			vec3 norm = cross(in2, in1);// in1.CrossProduct(in2);
+			vec3 norm = cross(in1, in2);// in1.CrossProduct(in2);
 			norm.normalize();
 			for (int j = 0; j < 3; ++j) {
 				normals[faces[i+j]] += norm;
@@ -34,7 +42,7 @@ public:
 			uv_coords[faces[i+2]].v = 0;
 		}
 		
-		foreach(i; normals) {
+		foreach(ref i; normals) {
 			i.normalize();
 		}
 	}
@@ -43,20 +51,34 @@ public:
 		auto color = vec4(0.5, 0.5, 0.5, 0.5);
 		glEnable(GL_COLOR_MATERIAL);
 		glColor4fv(color.value_ptr);
-		glShadeModel(GL_SMOOTH);
+		glShadeModel(GL_FLAT);
 		glAlphaFunc(GL_GREATER, 0.1f);
 		glEnable(GL_ALPHA_TEST);
 		glBegin(GL_TRIANGLES);
-		foreach(i; faces) { //Indexes::iterator i=faces.begin(); i!=faces.end(); ++i, ++uv) {
+		foreach(i; faces) {
 			glNormal3f(normals[i].x, normals[i].y, normals[i].z);
 			glTexCoord2f(uv_coords[i].u, uv_coords[i].v);
 			glVertex3f(coords[i].x, coords[i].y, coords[i].z);
 		}
 		glEnd();
+		
+		if(show_normals) {
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_COLOR_MATERIAL);
+			glDisable(GL_ALPHA_TEST);
+			glBegin(GL_LINES);
+			glColor4f(1, 1, 1, 1);
+			foreach(i; 0 .. coords.length) {
+				glVertex3f(coords[i].x, coords[i].y, coords[i].z);
+				glVertex3f(coords[i].x + normals[i].x, coords[i].y + normals[i].y, coords[i].z + normals[i].z);
+			}
+			glEnd();
+		}
 	}
 private:
 	vec3[] coords;
 	vec3[] normals;
 	int[] faces;
 	vec2[] uv_coords;
+	bool show_normals = 0;
 };
