@@ -56,7 +56,7 @@ public:
 		camera.Set_position(vec3(0, 0, 20));
 
 		auto lightnode = new Lightnode;
-		lightnode.Set_position(vec3(-1, 0, 0), 1);
+		lightnode.Set_position(vec3(0, 0, 1), 1);
 		
 		auto transformnode = new Transformnode;
 		transformnode.Set_scale(vec3(10, 10, 10));
@@ -73,13 +73,18 @@ public:
 		
 		globe = new Globe;
 		globe.Init(1);
-		auto model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 6);
-		model.Show_normals = false;
-		modelnode = new Modelnode;
-		modelnode.Set_model(model);
+		auto full_globe_model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 3);
+		full_globe_model.Color = vec4(1, 1, 1, 1);
+		full_globe = new Modelnode;
+		full_globe.Set_model(full_globe_model);
+
+		auto detailed_area_model = globe.Generate_detailed_location(vec3(0, 0, 1), 0.25, 6);
+		detailed_area_model.Color = vec4(0, 0, 1, 1);
+		detailed_area = new Modelnode;
+		detailed_area.Set_model(detailed_area_model);
 		
-		
-		transformnode.Attach_node(modelnode);
+		transformnode.Attach_node(detailed_area);
+		transformnode.Attach_node(full_globe);
 		//lightnode.Attach_node(quad);
 		lightnode.Attach_node(transformnode);
 		camera.Attach_node(lightnode);
@@ -107,8 +112,8 @@ public:
 	Scenenode root;
 	Cameranode camera;
 	Quadnode quad;
-	//Model model;
-	Modelnode modelnode;
+	Modelnode full_globe;
+	Modelnode detailed_area;
 	Globe globe;
 };
 

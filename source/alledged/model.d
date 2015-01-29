@@ -13,6 +13,14 @@ public:
     void Show_normals(bool sn) @property {
 		show_normals = sn;
 	}
+
+	vec4 Color() const @property {
+		return color;
+	}
+
+    void Color(vec4 c) @property {
+		color = c;
+	}
     
 	void Set_model_data(vec3[] c, int[] f) {
 		normals.length = c.length;
@@ -48,10 +56,9 @@ public:
 	}
 
 	void Render() {
-		auto color = vec4(0.5, 0.5, 0.5, 0.5);
 		glEnable(GL_COLOR_MATERIAL);
 		glColor4fv(color.value_ptr);
-		glShadeModel(GL_FLAT);
+		glShadeModel(GL_SMOOTH);
 		glAlphaFunc(GL_GREATER, 0.1f);
 		glEnable(GL_ALPHA_TEST);
 		glBegin(GL_TRIANGLES);
@@ -76,9 +83,10 @@ public:
 		}
 	}
 private:
+	vec4 color = vec4(1, 1, 1, 1);
 	vec3[] coords;
 	vec3[] normals;
 	int[] faces;
 	vec2[] uv_coords;
-	bool show_normals = 0;
+	bool show_normals = false;
 };
