@@ -1,5 +1,7 @@
 module alledged.model;
 
+import std.stdio;
+
 import derelict.opengl3.gl3;
 import derelict.opengl3.gl;
 import gl3n.linalg;
@@ -23,6 +25,7 @@ public:
 	}
     
 	void Set_model_data(vec3[] c, int[] f) {
+		writeln("Model data with ", f.length/3, " faces.");
 		normals.length = c.length;
 		uv_coords.length = c.length;
 		coords.length = c.length;
