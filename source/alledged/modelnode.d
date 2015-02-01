@@ -8,6 +8,10 @@ public:
 	void Set_model(Model m) {
 		model = m;
 	}
+
+	Model Get_model() {
+		return model;
+	}
 	
 	override void Render() {
 		if(model !is null) {

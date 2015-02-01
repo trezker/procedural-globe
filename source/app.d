@@ -1,6 +1,7 @@
 module pw.app;
 
 import std.stdio;
+import std.math;
 import derelict.opengl3.gl3;
 import derelict.opengl3.gl;
 import gl3n.linalg;
@@ -111,6 +112,59 @@ public:
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
 		Pop_view();
+		
+		Render_minimap();
+	}
+	
+	void Render_minimap() {
+		ALLEGRO_COLOR white = al_map_rgb_f(1, 1, 1);
+		ALLEGRO_COLOR black = al_map_rgb_f(0, 0, 0);
+		al_draw_filled_rectangle(0, 0, 256, 256, white);
+		vec3[] coords = full_globe.Get_model().Get_coords();
+		/*
+		float minx = 1;
+		float maxx = 1;
+		*/
+		foreach(coord; coords) {
+			//Make 2d vector on xz plane
+			//Get angle
+			//Scale angle to texture width
+			auto v = vec2(coord.x, coord.z);
+			v.normalize();
+			//writeln("X: ", xz.x, " Y: ", xz.y);
+			
+			auto xangle = acos(v.x);
+			if(v.y < 0) {
+				xangle += PI;
+			}
+			/*
+			writeln("Angle: ", xangle);
+			if(xangle < minx) {
+				minx = xangle;
+			}
+			if(angle > maxx) {
+				maxx = xangle;
+			}*/
+			
+			//Make 2d vector on yz plane, or yx if |x|>|z|
+			//Get angle
+			//Scale angle to texture width
+			v = vec2(coord.y, coord.z);
+			if(abs(coord.x) > abs(coord.z)) {
+				v.y = coord.x;
+			}
+			v.normalize();
+			//writeln("X: ", xz.x, " Y: ", xz.y);
+			
+			auto yangle = acos(v.x);
+			/*
+			if(v.y < 0) {
+				yangle += PI;
+			}
+			*/
+			al_draw_pixel(xangle * 256/(PI*2), yangle * 256/(PI), black);
+		}
+		//writeln("X: ", minx, " - ", maxx);
 	}
 
 	Scenenode root;
@@ -130,7 +184,7 @@ int main(char[][] args) {
 		
 		al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_OPENGL);
 		al_set_new_display_option(ALLEGRO_DISPLAY_OPTIONS.ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
-		ALLEGRO_DISPLAY* display = al_create_display(800, 600);
+		ALLEGRO_DISPLAY* display = al_create_display(1280, 1024);
 		if(!display) {
 			writeln("Failed to create display");
 			return 0;
@@ -280,6 +334,11 @@ int main(char[][] args) {
 							case ALLEGRO_KEY_E:
 							{
 								roll_right = false;
+								break;
+							}
+							case ALLEGRO_KEY_M:
+							{
+								scene.Render_minimap();
 								break;
 							}
 							default:

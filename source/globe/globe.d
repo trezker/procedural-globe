@@ -5,6 +5,21 @@ import std.algorithm;
 import gl3n.linalg;
 import alledged.model;
 
+/*
+ * Heightmap generation
+ * The mapgen algo requires normalization of the height. Otherwise it's likely to get all high or all low.
+ * The whole idea with this globe is that I don't want to generate the entire map at once.
+ * But in order to normalize I'd need all the data first.
+ * 
+ * An idea is to do the generation for the whole globe down to a suitable level that's still really quick.
+ * Do the normalization on that level.
+ * The further iterations can be allowed to go outside normalized range.
+ * The biggest elevation bias is in the first iterations as each loop decreases the random number range.
+ * Outside normal range just means deeper oceans and higher snowcovered mountains...
+ * 
+ * Also remember that to make neighbouring areas consistent each random number must depend on it's neighbours
+ * which must always be the same no matter where you go into a detailed map.
+ * */
 
 class Edge {
 public:

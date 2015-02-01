@@ -8,6 +8,10 @@ import gl3n.linalg;
 
 class Model {
 public:
+	vec3[] Get_coords() {
+		return coords[0 .. coords.length];
+	}
+
 	bool Show_normals() const @property {
 		return show_normals;
 	}
