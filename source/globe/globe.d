@@ -28,11 +28,6 @@ struct Pointdata {
 
 class Edge {
 public:
-/*
-	this(vec3[2] c) {
-		coords[] = c;
-	}
-*/
 	this(Pointdata[2] c) {
 		coords[] = c;
 	}
@@ -198,16 +193,6 @@ class Globe {
 public:
 	void Init(float r) {
 		radius = r;
-		/*
-		vec3[] coords = [
-			vec3(0, r, 0),
-			vec3(r, 0, 0),
-			vec3(0, 0, r),
-			vec3(0, -r, 0),
-			vec3(-r, 0, 0),
-			vec3(0, 0, -r),
-		];
-		*/
 		
 		Pointdata[] coords = [
 			Pointdata(vec3(0, r, 0), 0),
