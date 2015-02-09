@@ -22,7 +22,10 @@ import alledged.model;
  * which must always be the same no matter where you go into a detailed map.
  * */
 
-struct Pointdata {
+class Pointdata {
+	this(vec3 c) {
+		coord = c;
+	}
 	vec3 coord;
 	float height = 0;
 };
@@ -55,15 +58,15 @@ public:
 		if(children[0] is null) {
 			vec3 mid = coords[0].coord + coords[1].coord;
 			mid.normalize();
-			Pointdata midpoint = Pointdata(mid, 0);
+			Pointdata midpoint = new Pointdata(mid);
 			children[0] = new Edge([coords[0], midpoint]);
 			children[1] = new Edge([coords[1], midpoint]);
 		}
 		return children[0 .. 2];
 	}
 	
-	Pointdata[2] Get_coords() {
-		return coords[0 .. 2];
+	ref Pointdata[2] Get_coords() {
+		return coords;
 	}
 	
 	vec3 Get_nearest_point(vec3 center) {
@@ -207,8 +210,8 @@ public:
 		return c;
 	}
 	
-	Pointdata[3] Get_coords() {
-		return coords[0 .. 3];
+	ref Pointdata[3] Get_coords() {
+		return coords;
 	}
 private:
 	Globe globe;
@@ -224,12 +227,12 @@ public:
 		radius = r;
 		
 		Pointdata[] coords = [
-			Pointdata(vec3(0, r, 0)),
-			Pointdata(vec3(r, 0, 0)),
-			Pointdata(vec3(0, 0, r)),
-			Pointdata(vec3(0, -r, 0)),
-			Pointdata(vec3(-r, 0, 0)),
-			Pointdata(vec3(0, 0, -r)),
+			new Pointdata(vec3(0, r, 0)),
+			new Pointdata(vec3(r, 0, 0)),
+			new Pointdata(vec3(0, 0, r)),
+			new Pointdata(vec3(0, -r, 0)),
+			new Pointdata(vec3(-r, 0, 0)),
+			new Pointdata(vec3(0, 0, -r)),
 		];
 		
 		Edge[] edges = [
@@ -288,7 +291,21 @@ public:
 				if(p == -1) {
 					unique_points ~= corner;
 					corner.height = uniform(0.0f, 1.0f, rng);
-					writeln(corner.height);
+					writeln(&corner);
+				}
+			}
+		}
+
+
+		writeln("After Initial heights");
+		unique_points = [];
+		foreach(ref face; faces) {
+			auto corners = face.Get_coords();
+			foreach(ref corner; corners) {
+				int p = to!int(countUntil(unique_points, corner));
+				if(p == -1) {
+					unique_points ~= corner;
+					writeln(&corner);
 				}
 			}
 		}

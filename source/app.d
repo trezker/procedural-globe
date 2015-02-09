@@ -54,10 +54,14 @@ public:
 		root = new Scenenode;
 
 		camera = new Cameranode;
-		camera.Set_position(vec3(0, 0, 20));
+		camera.Set_position(vec3(0, 0, 50));
 
 		auto lightnode = new Lightnode;
 		lightnode.Set_position(vec3(0, 0, 1), 1);
+		lightnode.Set_specular(1, 1, 1, 1);
+		lightnode.Set_diffuse(0.8, 0.8, 0.8, 1);
+		lightnode.Set_ambient(0.1, 0.1, 0.1, 1);
+		
 		
 		auto transformnode = new Transformnode;
 		transformnode.Set_scale(vec3(10, 10, 10));
@@ -75,7 +79,7 @@ public:
 		globe = new Globe;
 		globe.Init(1);
 		writeln("Full globe");
-		auto full_globe_model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 1, 0, 0.625);
+		auto full_globe_model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 6, 0, 0.625);
 		full_globe_model.Color = vec4(1, 1, 1, 1);
 		full_globe = new Modelnode;
 		full_globe.Set_model(full_globe_model);
