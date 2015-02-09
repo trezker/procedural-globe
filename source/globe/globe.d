@@ -2,6 +2,7 @@ module globe.globe;
 
 import std.stdio;
 import std.algorithm;
+import std.random;
 import gl3n.linalg;
 import alledged.model;
 
@@ -23,7 +24,7 @@ import alledged.model;
 
 struct Pointdata {
 	vec3 coord;
-	float height;
+	float height = 0;
 };
 
 class Edge {
@@ -98,7 +99,7 @@ public:
 		level = l;
 	}
 
-	Face[] Get_children() {
+	Face[] Get_children(Mt19937 rng, float fractalfactor) {
 		if(children[0] is null) {
 			Edge[] childedges;
 			Pointdata[] midpoints;
@@ -119,7 +120,6 @@ public:
 			childedges ~= new Edge([midpoints[0], midpoints[1]]);
 			childedges ~= new Edge([midpoints[1], midpoints[2]]);
 			childedges ~= new Edge([midpoints[2], midpoints[0]]);
-			
 			
 			Pointdata[3] facecoords = [coords[0], midpoints[0], midpoints[2]];
 			Edge[3] faceedges = [childedges[0], childedges[8], childedges[5]];
@@ -154,6 +154,35 @@ public:
 			children[3] = f;
 		}
 		
+		//Generate random heights on childcorners.
+		//Level 1 generates heights for level 2 points, variance = fractalfactor ^ 1 = fractalfactor
+		//Level 2 generates heights for level 3 points, variance = fractalfactor ^ 2 and so on.
+		float variance = (fractalfactor ^^ level) / 2;
+
+		float avg_common = 0;
+		foreach(corner; coords) {
+			avg_common += corner.height / 4;
+		}
+
+		foreach(i; 0..3) {
+			float avg = avg_common;
+			Face neighbour = edges[i].Get_neighbour(this);
+			//TODO: I don't think neighbour should ever be null here, find out why it is.
+			if(neighbour is null) {
+				avg *= 4/3;
+			}
+			else {
+				foreach(corner; neighbour.Get_coords()) {
+					if(-1 == to!int(countUntil(coords[0 .. 3], corner))) {
+						avg += corner.height / 4;
+						break;
+					}
+				}
+			}
+			
+			Pointdata midpoint = edges[i].Get_children()[0].Get_coords()[1];
+			midpoint.height = uniform(avg-variance, avg+variance, rng);
+		}
 		return children[0 .. 4];
 	}
 	
@@ -195,12 +224,12 @@ public:
 		radius = r;
 		
 		Pointdata[] coords = [
-			Pointdata(vec3(0, r, 0), 0),
-			Pointdata(vec3(r, 0, 0), 0),
-			Pointdata(vec3(0, 0, r), 0),
-			Pointdata(vec3(0, -r, 0), 0),
-			Pointdata(vec3(-r, 0, 0), 0),
-			Pointdata(vec3(0, 0, -r), 0),
+			Pointdata(vec3(0, r, 0)),
+			Pointdata(vec3(r, 0, 0)),
+			Pointdata(vec3(0, 0, r)),
+			Pointdata(vec3(0, -r, 0)),
+			Pointdata(vec3(-r, 0, 0)),
+			Pointdata(vec3(0, 0, -r)),
 		];
 		
 		Edge[] edges = [
@@ -246,7 +275,24 @@ public:
 		}
 	}
 	
-	Model Generate_detailed_location(vec3 center, float r, int level_of_detail) {
+	Model Generate_detailed_location(vec3 center, float r, int level_of_detail, uint randomseed, float fractalfactor) {
+		//Initialize top level with random heights.
+		auto rng = Random(randomseed);
+		Pointdata[] unique_points;
+		writeln("Initial heights");
+		//TODO: Heights are set here but disappear along the way, figure out why
+		foreach(ref face; faces) {
+			auto corners = face.Get_coords();
+			foreach(ref corner; corners) {
+				int p = to!int(countUntil(unique_points, corner));
+				if(p == -1) {
+					unique_points ~= corner;
+					corner.height = uniform(0.0f, 1.0f, rng);
+					writeln(corner.height);
+				}
+			}
+		}
+
 		//Find any faces with an edge that goes inside the sphere. 
 		/*	To avoid doing the math twice for each edge don't simply go through faces.
 		 * 	This adds complexity though, and I'm not sure doing the math is more expensive than the extra loops you'd need.
@@ -283,7 +329,7 @@ public:
 				candidate_faces = [];
 				//Split each selected face
 				foreach(face; included_faces) {
-					candidate_faces ~= face.Get_children();
+					candidate_faces ~= face.Get_children(rng, fractalfactor);
 				}
 				//Reset included, we're not interested in this level of detail.
 				included_faces = [];
@@ -307,8 +353,14 @@ public:
 			}
 		}
 		vec3[] model_coords;
+		writeln("Final heights");
 		foreach(point; model_points) {
-			model_coords ~= point.coord;
+			vec3 p = vec3(point.coord);
+			p.x += point.coord.x * point.height;
+			p.y += point.coord.y * point.height;
+			p.z += point.coord.z * point.height;
+			writeln(point.height);
+			model_coords ~= p;
 		}
 		Model model = new Model;
 		model.Set_model_data(model_coords, model_faces);

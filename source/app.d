@@ -75,20 +75,21 @@ public:
 		globe = new Globe;
 		globe.Init(1);
 		writeln("Full globe");
-		auto full_globe_model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 5);
+		auto full_globe_model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 1, 0, 0.625);
 		full_globe_model.Color = vec4(1, 1, 1, 1);
 		full_globe = new Modelnode;
 		full_globe.Set_model(full_globe_model);
 		writeln("Generated");
 
+		/*
 		writeln("Deailed area");
-		auto detailed_area_model = globe.Generate_detailed_location(vec3(0, 0, 1), 0.1, 9);
+		auto detailed_area_model = globe.Generate_detailed_location(vec3(0, 0, 1), 0.1, 9, 0, 0.625);
 		detailed_area_model.Color = vec4(0, 0, 1, 1);
 		detailed_area = new Modelnode;
 		detailed_area.Set_model(detailed_area_model);
 		writeln("Generated");
-		
-		transformnode.Attach_node(detailed_area);
+		*/
+		//transformnode.Attach_node(detailed_area);
 		transformnode.Attach_node(full_globe);
 		//lightnode.Attach_node(quad);
 		lightnode.Attach_node(transformnode);
