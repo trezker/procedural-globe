@@ -282,8 +282,6 @@ public:
 		//Initialize top level with random heights.
 		auto rng = Random(randomseed);
 		Pointdata[] unique_points;
-		writeln("Initial heights");
-		//TODO: Heights are set here but disappear along the way, figure out why
 		foreach(ref face; faces) {
 			auto corners = face.Get_coords();
 			foreach(ref corner; corners) {
@@ -291,21 +289,6 @@ public:
 				if(p == -1) {
 					unique_points ~= corner;
 					corner.height = uniform(0.0f, 1.0f, rng);
-					writeln(&corner);
-				}
-			}
-		}
-
-
-		writeln("After Initial heights");
-		unique_points = [];
-		foreach(ref face; faces) {
-			auto corners = face.Get_coords();
-			foreach(ref corner; corners) {
-				int p = to!int(countUntil(unique_points, corner));
-				if(p == -1) {
-					unique_points ~= corner;
-					writeln(&corner);
 				}
 			}
 		}
@@ -370,13 +353,11 @@ public:
 			}
 		}
 		vec3[] model_coords;
-		writeln("Final heights");
 		foreach(point; model_points) {
 			vec3 p = vec3(point.coord);
 			p.x += point.coord.x * point.height;
 			p.y += point.coord.y * point.height;
 			p.z += point.coord.z * point.height;
-			writeln(point.height);
 			model_coords ~= p;
 		}
 		Model model = new Model;
