@@ -2,6 +2,7 @@ module pw.app;
 
 import std.stdio;
 import std.math;
+import std.random;
 import derelict.opengl3.gl3;
 import derelict.opengl3.gl;
 import gl3n.linalg;
@@ -79,7 +80,7 @@ public:
 		globe = new Globe;
 		globe.Init(1);
 		writeln("Full globe");
-		auto full_globe_model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 6, 0, 0.625);
+		auto full_globe_model = globe.Generate_detailed_location(vec3(0, 0, 0), 1, 6, unpredictableSeed, 0.625);
 		full_globe_model.Color = vec4(1, 1, 1, 1);
 		full_globe = new Modelnode;
 		full_globe.Set_model(full_globe_model);

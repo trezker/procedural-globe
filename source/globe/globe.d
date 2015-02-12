@@ -336,6 +336,9 @@ public:
 			}
 		}
 		
+		float highest;
+		float lowest;
+		
 		//Create model
 		Pointdata[] model_points;
 		int[] model_faces;
@@ -344,6 +347,12 @@ public:
 			foreach(corner; corners) {
 				int p = to!int(countUntil(model_points, corner));
 				if(p == -1) {
+					if(isNaN(highest) || corner.height > highest) {
+						highest = corner.height;
+					}
+					if(isNaN(lowest) || corner.height < lowest) {
+						lowest = corner.height;
+					}
 					model_points ~= corner;
 					model_faces ~= to!int(model_points.length - 1);
 				}
@@ -353,11 +362,12 @@ public:
 			}
 		}
 		vec3[] model_coords;
-		foreach(point; model_points) {
+		foreach(ref point; model_points) {
+			point.height = (point.height - lowest)/(highest - lowest);
 			vec3 p = vec3(point.coord);
-			p.x += point.coord.x * point.height;
-			p.y += point.coord.y * point.height;
-			p.z += point.coord.z * point.height;
+			p.x += point.coord.x * (point.height-0.5f) / 8.0f;
+			p.y += point.coord.y * (point.height-0.5f) / 8.0f;
+			p.z += point.coord.z * (point.height-0.5f) / 8.0f;
 			model_coords ~= p;
 		}
 		Model model = new Model;
